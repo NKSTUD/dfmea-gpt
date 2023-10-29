@@ -1,1 +1,1 @@
-web gunicorn ChatGptClone.wsgi:application --log-file
+web gunicorn ChatGptClone.wsgi:application
