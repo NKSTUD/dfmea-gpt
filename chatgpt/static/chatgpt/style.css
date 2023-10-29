@@ -1,0 +1,69 @@
+
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+}
+
+.htmx-request .htmx-indicator {
+    opacity: 1
+}
+
+.htmx-request.htmx-indicator {
+    opacity: 1
+}
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
+pre {
+    @apply text-sm font-mono text-gray-900 bg-gray-100 rounded-md p-2 overflow-x-auto;
+}
+
+:not(pre) > code {
+    @apply text-sm font-mono text--900 bg-gray-100 rounded-md p-1;
+}
+
+.ia-message {
+    background-color: #eef2fc;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    width: 100%;
+}
+
+thead {
+    background-color: deepskyblue;
+}
+
+#scrollToBottomButton {
+    position: fixed;
+    right: 20px;
+    bottom: 30%;
+    width: 40px;
+    height: 40px;
+    background-color: #007bff;
+    border-radius: 50%; /* Pour rendre le bouton rond */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+    z-index: 1;
+}
+
+#scrollToBottomButton i {
+    transform: rotate(90deg);
+}
+
+

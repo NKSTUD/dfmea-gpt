@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <main class="container">
+        <a class="btn btn-primary mt-3" href="{% url 'home' %}">Refresh</a>
+        <h2 class="text text-center mt-5">GPT FOR ENHANCED DFMEA</h2>
+        <br>
+        {% for table in tables %}
+            <div class="p-3 rounded-3" style="background-color:#eef2fc">
+                <p class="text text-center">{{ table.created }}</p>
+                <div class="d-flex justify-content-between row">
+                    <div class="col-md-4">
+                        <h4 class="text text-center">Review</h4>
+                        {{ table.part_name }}
+                    </div>
+
+                    <div class="col-md-8">
+                        <h4 class="text text-center">Relevant informations</h4>
+                        {{ table.relevant_informations|safe }}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text text-center">DFMEA TABLE</h4>
+
+                    {{ table.code|safe }}
+                </div>
+                <button class="btn btn-danger mt-0" hx-delete="{% url 'delete_table' table.pk %}">DELETE</button>
+            </div>
+            <br>
+            <br>
+            <br>
+        {% endfor %}
+        <div id="chat-template" class="mb-5">
+            <p class="message">
+            </p>
+        </div>
+        <div id="gpt-output"></div>
+        <div class="row">
+            <div class="col-8 mx-auto mt-5 fixed-bottom">
+                <form id="prompt-form" class="row">
+                    <div class="col-10 mb-3">
+                        <label for="prompt" class="visually-hidden">User Prompt</label>
+                        <input type="text" name="prompt"
+                               class="form-control form-control-sm"
+                               id="prompt"
+                               placeholder="Enter a prompt here"
+
+                        >
+                    </div>
+                    <div id="scrollToBottomButton">
+                        &#8595;
+                    </div>
+
+                    <div class="col-2 mb-3 d-flex align-items-center">
+                        <button class="btn btn-primary btn-sm w-100">
+                            submit <span class="spinner-border spinner-border-sm htmx-indicator" id="spinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var scrollToBottomButton = document.getElementById("scrollToBottomButton");
+        var isAtTop = true;
+
+        scrollToBottomButton.addEventListener("click", function () {
+            if (isAtTop) {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth"
+                });
+                isAtTop = false;
+            } else {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+                isAtTop = true;
+            }
+        });
+
+    </script>
+{% endblock %}
