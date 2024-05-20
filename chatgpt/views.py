@@ -11,6 +11,9 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import openai
 
+import google.generativeai as genai
+
+
 import prompts
 from chatgpt.models import Table
 from decouple import config
@@ -53,13 +56,15 @@ def build_conversation_dict(messages: list) -> list[dict]:
         for i, message in enumerate(messages)
     ]
 
-    return [
+    gpt_messages = [
 
         {"role": "system",
          "content": prompts.context
          },
 
-    ] + prompts.example + limit_context_length(context_messages)
+    ] + prompts.example + context_messages
+
+    return transform_to_gemini(gpt_messages)
 
 
 def extract_table_content(html_content):
@@ -71,18 +76,27 @@ def extract_table_content(html_content):
 
 def event_stream(conversations: list[dict]) -> str:
     code = ""
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-16k",
-        messages=conversations,
-        stream=True,
+    # response = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo-16k",
+    #     messages=conversations,
+    #     stream=True,
+    #
+    # )
 
-    )
+    model = genai.GenerativeModel('gemini-1.5-pro-latest')
+
+    response = model.generate_content(conversations, stream=True)
+
+    print(conversations)
+
     for line in response:
-        if content := line.choices[0].delta.get("content", ""):
+        #if content := line.choices[0].delta.get("content", ""):
+        if content := line.text:
             yield content
             code += content
     if tables := extract_table_content(code):
-        part_name = conversations[-1].get("content")
+        part_name = conversations[-1].get("parts")[0].replace("*", "")
+
         if tables:
             code = tables[1] if len(tables) > 1 else None
             relevant_informations = tables[0] if len(tables) > 0 else None
@@ -94,6 +108,22 @@ def delete_table(request, pk):
     table = Table.objects.get(pk=pk)
     table.delete()
     return HttpResponseClientRedirect(reverse('home'))
+
+
+def transform_to_gemini(messages_chatgpt):
+    messages_gemini = []
+    system_promt = ''
+    for message in messages_chatgpt:
+        if message['role'] == 'system':
+            system_promt = message['content']
+        elif message['role'] == 'user':
+            messages_gemini.append({'role': 'user', 'parts': [message['content']]})
+        elif message['role'] == 'assistant':
+            messages_gemini.append({'role': 'model', 'parts': [message['content']]})
+    if system_promt:
+        messages_gemini[0]['parts'].insert(0, f"*{system_promt}*")
+
+    return messages_gemini
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from django.db import models
 
 class Table(models.Model):
     code = models.TextField(null=True, blank=True)
-    part_name = models.TextField(max_length=100)
+    part_name = models.TextField(max_length=100,blank=True,null=True, default="default_part")
     relevant_informations = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
